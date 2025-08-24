@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Widget</title>
+    <title>Debug Test Widget</title>
     <style>
         body {
             margin: 0;
             padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             min-height: 300px;
@@ -20,158 +20,91 @@
         }
 
         .widget-container {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.2);
             padding: 30px;
             border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
             max-width: 400px;
             width: 100%;
-            transition: transform 0.15s ease;
-            user-select: none;
+            cursor: pointer;
         }
 
-        .widget-container:hover {
-            transform: scale(1.02);
+        .click-box {
+            background: rgba(255, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border: 2px dashed white;
+            cursor: pointer;
         }
 
-        h1 {
-            margin: 0 0 20px 0;
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .test-image {
-            width: 100px;
-            height: 100px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            margin: 0 auto 20px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-        }
-
-        .info-text {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            opacity: 0.9;
-        }
-
-        .mobile-indicator {
-            padding: 10px 20px;
-            background: rgba(0, 255, 0, 0.2);
-            border-radius: 15px;
-            font-size: 14px;
-            margin-top: 15px;
-        }
-
-        .timestamp {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: 15px;
-        }
-
-        /* Mobile specific styles */
-        @media (max-width: 480px) {
-            .widget-container {
-                padding: 20px;
-                margin: 10px;
-            }
-            
-            h1 {
-                font-size: 20px;
-            }
-            
-            .mobile-indicator {
-                background: rgba(0, 255, 0, 0.3);
-                border: 1px solid rgba(0, 255, 0, 0.5);
-            }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="widget-container">
-        <div class="test-image">✨</div>
-        <h1>Test Widget Working!</h1>
-        <div class="info-text">
-            This is a JavaScript test widget! Click anywhere on this box to test interactivity.
+        <h1>🔧 Debug Test Widget</h1>
+        
+        <div class="status" id="jsStatus">JavaScript: Loading...</div>
+        <div class="status" id="deviceStatus">Device: Checking...</div>
+        <div class="status" id="timeStatus">Time: Loading...</div>
+        
+        <div class="click-box" onclick="testClick()" id="clickBox">
+            <h3>CLICK THIS RED BOX</h3>
+            <div id="clickCounter">Clicks: 0</div>
         </div>
-        <div class="mobile-indicator" id="deviceInfo">
-            Checking device...
-        </div>
-        <div id="clickCounter" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.2); border-radius: 15px; font-size: 14px; margin-top: 10px;">
-            Click me to test JavaScript!
-        </div>
-        <div class="timestamp" id="timestamp">
-            Loading...
-        </div>
+        
+        <div class="status" id="lastAction">Last Action: None</div>
     </div>
 
     <script>
-        let clickCount = 0;
-        let colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
-        let currentColorIndex = 0;
-
-        // Simple JavaScript to show it's working
-        function updateWidget() {
-            const now = new Date();
-            const timeString = now.toLocaleString();
-            document.getElementById('timestamp').textContent = 'Last updated: ' + timeString;
+        let clicks = 0;
+        
+        // Test if JavaScript is working at all
+        document.getElementById('jsStatus').textContent = 'JavaScript: ✅ WORKING';
+        
+        // Test device detection
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        document.getElementById('deviceStatus').textContent = isMobile ? 'Device: 📱 Mobile' : 'Device: 💻 Desktop';
+        
+        // Test time updates
+        function updateTime() {
+            const now = new Date().toLocaleTimeString();
+            document.getElementById('timeStatus').textContent = 'Time: ' + now;
+        }
+        updateTime();
+        setInterval(updateTime, 5000);
+        
+        // Test click function
+        function testClick() {
+            clicks++;
             
-            // Detect if mobile
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const deviceInfo = document.getElementById('deviceInfo');
+            // Update counter
+            document.getElementById('clickCounter').textContent = 'Clicks: ' + clicks;
             
-            if (isMobile) {
-                deviceInfo.textContent = '📱 Mobile Device Detected - JS Working!';
-                deviceInfo.style.background = 'rgba(0, 255, 0, 0.3)';
-            } else {
-                deviceInfo.textContent = '💻 Desktop Device Detected - JS Working!';
-                deviceInfo.style.background = 'rgba(255, 255, 0, 0.3)';
+            // Update last action
+            document.getElementById('lastAction').textContent = 'Last Action: Clicked at ' + new Date().toLocaleTimeString();
+            
+            // Change colors
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6', '#e74c3c'];
+            const randomColor = colors[clicks % colors.length];
+            document.body.style.background = `linear-gradient(135deg, ${randomColor} 0%, #2c3e50 100%)`;
+            
+            // Log to console
+            console.log('Click registered! Total clicks:', clicks);
+            
+            // Alert for extra confirmation
+            if (clicks === 1) {
+                alert('🎉 JavaScript click detection is WORKING!');
             }
         }
-
-        // Interactive click function
-        function handleClick() {
-            clickCount++;
-            currentColorIndex = (currentColorIndex + 1) % colors.length;
-            
-            // Change background gradient
-            const color1 = colors[currentColorIndex];
-            const color2 = colors[(currentColorIndex + 1) % colors.length];
-            document.body.style.background = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
-            
-            // Update click counter
-            document.getElementById('clickCounter').textContent = `Clicked ${clickCount} times!`;
-            
-            // Add animation effect
-            const container = document.querySelector('.widget-container');
-            container.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-                container.style.transform = 'scale(1)';
-            }, 150);
-            
-            console.log('Click registered! Count:', clickCount);
-        }
-
-        // Add event listeners when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('JavaScript loaded and ready!');
-            
-            // Make the widget clickable
-            const container = document.querySelector('.widget-container');
-            container.addEventListener('click', handleClick);
-            container.style.cursor = 'pointer';
-            
-            // Initial update
-            updateWidget();
-            
-            // Update every 10 seconds for testing
-            setInterval(updateWidget, 10000);
-        });
+        
+        console.log('Debug widget loaded successfully!');
     </script>
 </body>
 </html>
