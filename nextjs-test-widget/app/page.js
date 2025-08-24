@@ -1,124 +1,323 @@
+// app/page.js
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
-export default function TestWidget() {
-  const [clicks, setClicks] = useState(0);
-  const [currentTime, setCurrentTime] = useState('');
-  const [isMobile, setIsMobile] = useState(false);
-  const [nextJsWorking, setNextJsWorking] = useState(false);
-
-  useEffect(() => {
-    setNextJsWorking(true);
-    console.log('Next.js widget loaded!');
-    
-    const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    setIsMobile(mobile);
-    
-    const updateTime = () => {
-      setCurrentTime(new Date().toLocaleTimeString());
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleClick = () => {
-    setClicks(prev => {
-      const newCount = prev + 1;
-      console.log('Next.js click registered! Count:', newCount);
-      return newCount;
-    });
+// Simplified InstagramHeader component
+function InstagramHeader({ bioData, isVisible }) {
+  const profileData = bioData || {
+    username: '@test_account',
+    name: 'Test Account',
+    bio: 'Testing Instagram widget on mobile 📱\nSimplified version for testing',
+    website: 'example.com'
   };
 
-  const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
-  const bgColor = colors[clicks % colors.length];
+  if (!isVisible) return null;
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: `linear-gradient(135deg, ${bgColor} 0%, #2c3e50 100%)`,
-      color: 'white',
-      fontFamily: 'Arial, sans-serif',
-      padding: '20px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      transition: 'background 0.5s ease'
+    <div style={{ 
+      padding: '20px', 
+      borderBottom: '1px solid #efefef',
+      textAlign: 'center',
+      background: 'white'
     }}>
       <div style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        padding: '30px',
-        borderRadius: '20px',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        maxWidth: '400px',
-        width: '100%',
-        textAlign: 'center',
-        cursor: 'pointer',
-        transition: 'transform 0.15s ease'
-      }}
-      onClick={handleClick}
-      >
-        <div style={{
-          width: '80px',
-          height: '80px',
-          background: 'rgba(255, 255, 255, 0.2)',
-          borderRadius: '50%',
-          margin: '0 auto 20px auto',
+        width: '80px',
+        height: '80px',
+        borderRadius: '50%',
+        background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
+        margin: '0 auto 15px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontSize: '24px'
+      }}>
+        📸
+      </div>
+      <h1 style={{ fontSize: '18px', fontWeight: '600', margin: '0 0 5px 0' }}>
+        {profileData.username}
+      </h1>
+      {profileData.name && (
+        <h2 style={{ fontSize: '14px', fontWeight: 'normal', color: '#8e8e8e', margin: '0 0 10px 0' }}>
+          {profileData.name}
+        </h2>
+      )}
+      {profileData.bio && (
+        <p style={{ fontSize: '14px', lineHeight: '1.4', margin: '10px 0', whiteSpace: 'pre-line' }}>
+          {profileData.bio}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// Main ProWidget component
+export default function SimplifiedProWidget() {
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedPlatform, setSelectedPlatform] = useState('all');
+  const [showBio, setShowBio] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [testStatus, setTestStatus] = useState({
+    react: false,
+    hooks: false,
+    effects: false,
+    api: false
+  });
+
+  // Simulate your image data structure
+  const sampleImages = [
+    { id: 1, title: 'Test Image 1', platform: 'Instagram', media: [{ url: 'https://picsum.photos/300/300?random=1' }] },
+    { id: 2, title: 'Test Image 2', platform: 'TikTok', media: [{ url: 'https://picsum.photos/300/300?random=2' }] },
+    { id: 3, title: 'Test Image 3', platform: 'Instagram', media: [{ url: 'https://picsum.photos/300/300?random=3' }] },
+    { id: 4, title: 'Test Image 4', platform: 'Instagram', media: [{ url: 'https://picsum.photos/300/300?random=4' }] },
+    { id: 5, title: 'Test Image 5', platform: 'TikTok', media: [{ url: 'https://picsum.photos/300/300?random=5' }] },
+    { id: 6, title: 'Test Image 6', platform: 'Instagram', media: [{ url: 'https://picsum.photos/300/300?random=6' }] },
+    { id: 7, title: 'Test Image 7', platform: 'Instagram', media: [{ url: 'https://picsum.photos/300/300?random=7' }] },
+    { id: 8, title: 'Test Image 8', platform: 'TikTok', media: [{ url: 'https://picsum.photos/300/300?random=8' }] },
+    { id: 9, title: 'Test Image 9', platform: 'Instagram', media: [{ url: 'https://picsum.photos/300/300?random=9' }] },
+  ];
+
+  // Test React hooks and effects
+  useEffect(() => {
+    console.log('✅ useEffect working - component mounted');
+    setTestStatus(prev => ({ ...prev, react: true, effects: true }));
+    
+    // Simulate data loading
+    setTimeout(() => {
+      setImages(sampleImages);
+      setLoading(false);
+      setTestStatus(prev => ({ ...prev, hooks: true }));
+      console.log('✅ useState working - data loaded');
+    }, 1000);
+  }, []);
+
+  // Test API simulation
+  useEffect(() => {
+    const testAPI = async () => {
+      try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts/1');
+        const data = await response.json();
+        console.log('✅ API fetch working:', data.title);
+        setTestStatus(prev => ({ ...prev, api: true }));
+      } catch (error) {
+        console.log('❌ API fetch failed:', error.message);
+      }
+    };
+    testAPI();
+  }, []);
+
+  // Mimic your filtering logic
+  const filteredImages = useMemo(() => {
+    if (selectedPlatform === 'all') return images;
+    return images.filter(img => img.platform === selectedPlatform);
+  }, [images, selectedPlatform]);
+
+  const availablePlatforms = useMemo(() => {
+    const platforms = images.map(img => img.platform)
+      .filter((platform, index, arr) => arr.indexOf(platform) === index);
+    return platforms;
+  }, [images]);
+
+  // Mimic your grid display logic
+  const displayedItems = useMemo(() => {
+    const minGridSize = 9;
+    const totalItems = Math.max(minGridSize, filteredImages.length);
+    return Array.from({ length: totalItems }).map((_, i) => filteredImages[i] || null);
+  }, [filteredImages]);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    console.log('🔄 Refresh triggered');
+    setTimeout(() => {
+      setIsRefreshing(false);
+      console.log('✅ Refresh completed');
+    }, 2000);
+  };
+
+  const handleBioToggle = () => {
+    setShowBio(prev => !prev);
+    console.log('📄 Bio toggled:', !showBio);
+  };
+
+  const handleImageClick = (item, index) => {
+    if (item) {
+      alert(`Clicked: ${item.title} (${item.platform})`);
+      console.log('🖼️ Image click working:', item);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        background: '#fafafa' 
+      }}>
+        <div>Loading Instagram Widget Test...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', padding: '8px', background: '#fafafa' }}>
+      {/* Test Status Bar */}
+      <div style={{
+        background: 'white',
+        padding: '10px',
+        borderRadius: '8px',
+        marginBottom: '10px',
+        fontSize: '12px',
+        display: 'flex',
+        gap: '15px',
+        flexWrap: 'wrap'
+      }}>
+        <span style={{ color: testStatus.react ? 'green' : 'red' }}>
+          {testStatus.react ? '✅' : '❌'} React: {testStatus.react ? 'Working' : 'Failed'}
+        </span>
+        <span style={{ color: testStatus.hooks ? 'green' : 'red' }}>
+          {testStatus.hooks ? '✅' : '❌'} Hooks: {testStatus.hooks ? 'Working' : 'Failed'}
+        </span>
+        <span style={{ color: testStatus.effects ? 'green' : 'red' }}>
+          {testStatus.effects ? '✅' : '❌'} Effects: {testStatus.effects ? 'Working' : 'Failed'}
+        </span>
+        <span style={{ color: testStatus.api ? 'green' : 'red' }}>
+          {testStatus.api ? '✅' : '❌'} API: {testStatus.api ? 'Working' : 'Failed'}
+        </span>
+      </div>
+
+      <div style={{ 
+        maxWidth: '375px', 
+        margin: '0 auto', 
+        background: 'white', 
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+      }}>
+        {/* Instagram Header */}
+        <InstagramHeader bioData={null} isVisible={showBio} />
+
+        {/* Controls */}
+        <div style={{ 
+          padding: '15px', 
+          borderBottom: '1px solid #efefef',
           display: 'flex',
+          gap: '10px',
           alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '30px'
+          flexWrap: 'wrap'
         }}>
-          ⚛️
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            style={{
+              padding: '8px 12px',
+              backgroundColor: '#0095f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            {isRefreshing ? '🔄 Refreshing...' : '🔄 Refresh'}
+          </button>
+
+          <button
+            onClick={handleBioToggle}
+            style={{
+              padding: '8px 12px',
+              backgroundColor: showBio ? '#262626' : '#dbdbdb',
+              color: showBio ? 'white' : '#262626',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            {showBio ? 'Hide Bio' : 'Show Bio'}
+          </button>
+
+          <select
+            value={selectedPlatform}
+            onChange={(e) => setSelectedPlatform(e.target.value)}
+            style={{
+              padding: '8px',
+              borderRadius: '6px',
+              border: '1px solid #dbdbdb',
+              fontSize: '12px'
+            }}
+          >
+            <option value="all">All Platforms</option>
+            {availablePlatforms.map(platform => (
+              <option key={platform} value={platform}>{platform}</option>
+            ))}
+          </select>
         </div>
-        
-        <h1 style={{ margin: '0 0 20px 0', fontSize: '24px' }}>
-          Next.js Test Widget!
-        </h1>
-        
-        <div style={{ marginBottom: '15px', opacity: 0.9 }}>
-          Testing if Next.js React works in Notion mobile
-        </div>
-        
+
+        {/* Instagram Grid */}
         <div style={{
-          padding: '10px 20px',
-          background: nextJsWorking ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 0, 0.3)',
-          borderRadius: '15px',
-          fontSize: '14px',
-          marginBottom: '10px'
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '2px'
         }}>
-          {nextJsWorking ? '✅ Next.js React: WORKING' : '❌ Next.js React: FAILED'}
+          {displayedItems.map((item, index) => (
+            <div
+              key={index}
+              onClick={() => handleImageClick(item, index)}
+              style={{
+                aspectRatio: '1',
+                backgroundColor: '#f0f0f0',
+                position: 'relative',
+                cursor: 'pointer',
+                overflow: 'hidden'
+              }}
+            >
+              {item ? (
+                <img
+                  src={item.media[0]?.url}
+                  alt={item.title}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.parentNode.innerHTML = `
+                      <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 10px; color: #999;">
+                        ${item.platform}<br/>${item.title}
+                      </div>
+                    `;
+                  }}
+                />
+              ) : (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  fontSize: '12px',
+                  color: '#999'
+                }}>
+                  {index + 1}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-        
+
+        {/* Debug Info */}
         <div style={{
-          padding: '10px 20px',
-          background: isMobile ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 255, 0, 0.3)',
-          borderRadius: '15px',
-          fontSize: '14px',
-          marginBottom: '10px'
-        }}>
-          {isMobile ? '📱 Mobile Device Detected' : '💻 Desktop Device Detected'}
-        </div>
-        
-        <div style={{
-          padding: '10px 20px',
-          background: 'rgba(255, 255, 255, 0.2)',
-          borderRadius: '15px',
-          fontSize: '14px',
-          marginBottom: '10px'
-        }}>
-          Clicks: {clicks} | Time: {currentTime}
-        </div>
-        
-        <div style={{
+          padding: '10px',
           fontSize: '12px',
-          opacity: 0.7,
-          marginTop: '15px'
+          color: '#8e8e8e',
+          borderTop: '1px solid #efefef'
         }}>
-          Click anywhere to test React state updates!
+          Total: {images.length} | Filtered: {filteredImages.length} | Platform: {selectedPlatform}
         </div>
       </div>
     </div>
