@@ -27,6 +27,12 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             max-width: 400px;
             width: 100%;
+            transition: transform 0.15s ease;
+            user-select: none;
+        }
+
+        .widget-container:hover {
+            transform: scale(1.02);
         }
 
         h1 {
@@ -91,10 +97,13 @@
         <div class="test-image">✨</div>
         <h1>Test Widget Working!</h1>
         <div class="info-text">
-            This is a simple test widget to check if it displays properly in Notion mobile app.
+            This is a JavaScript test widget! Click anywhere on this box to test interactivity.
         </div>
         <div class="mobile-indicator" id="deviceInfo">
             Checking device...
+        </div>
+        <div id="clickCounter" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.2); border-radius: 15px; font-size: 14px; margin-top: 10px;">
+            Click me to test JavaScript!
         </div>
         <div class="timestamp" id="timestamp">
             Loading...
@@ -102,6 +111,10 @@
     </div>
 
     <script>
+        let clickCount = 0;
+        let colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
+        let currentColorIndex = 0;
+
         // Simple JavaScript to show it's working
         function updateWidget() {
             const now = new Date();
@@ -113,17 +126,52 @@
             const deviceInfo = document.getElementById('deviceInfo');
             
             if (isMobile) {
-                deviceInfo.textContent = '📱 Mobile Device Detected';
+                deviceInfo.textContent = '📱 Mobile Device Detected - JS Working!';
                 deviceInfo.style.background = 'rgba(0, 255, 0, 0.3)';
             } else {
-                deviceInfo.textContent = '💻 Desktop Device Detected';
+                deviceInfo.textContent = '💻 Desktop Device Detected - JS Working!';
                 deviceInfo.style.background = 'rgba(255, 255, 0, 0.3)';
             }
         }
 
-        // Update immediately and then every 30 seconds
-        updateWidget();
-        setInterval(updateWidget, 30000);
+        // Interactive click function
+        function handleClick() {
+            clickCount++;
+            currentColorIndex = (currentColorIndex + 1) % colors.length;
+            
+            // Change background gradient
+            const color1 = colors[currentColorIndex];
+            const color2 = colors[(currentColorIndex + 1) % colors.length];
+            document.body.style.background = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+            
+            // Update click counter
+            document.getElementById('clickCounter').textContent = `Clicked ${clickCount} times!`;
+            
+            // Add animation effect
+            const container = document.querySelector('.widget-container');
+            container.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                container.style.transform = 'scale(1)';
+            }, 150);
+            
+            console.log('Click registered! Count:', clickCount);
+        }
+
+        // Add event listeners when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('JavaScript loaded and ready!');
+            
+            // Make the widget clickable
+            const container = document.querySelector('.widget-container');
+            container.addEventListener('click', handleClick);
+            container.style.cursor = 'pointer';
+            
+            // Initial update
+            updateWidget();
+            
+            // Update every 10 seconds for testing
+            setInterval(updateWidget, 10000);
+        });
     </script>
 </body>
 </html>
