@@ -8,7 +8,7 @@ function InstagramHeader({ bioData, isVisible }) {
   const profileData = bioData || {
     username: '@test_account',
     name: 'Test Account',
-    bio: 'Testing Instagram widget on mobile 📱\nSimplified version for testing',
+    bio: 'Testing Instagram widget on mobile\nSimplified version for testing',
     website: 'example.com'
   };
 
@@ -33,7 +33,7 @@ function InstagramHeader({ bioData, isVisible }) {
         color: 'white',
         fontSize: '24px'
       }}>
-        📸
+        CAM
       </div>
       <h1 style={{ fontSize: '18px', fontWeight: '600', margin: '0 0 5px 0' }}>
         {profileData.username}
@@ -56,7 +56,6 @@ function InstagramHeader({ bioData, isVisible }) {
 export default function SimplifiedProWidget() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [showBio, setShowBio] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -82,7 +81,7 @@ export default function SimplifiedProWidget() {
 
   // Test React hooks and effects
   useEffect(() => {
-    console.log('✅ useEffect working - component mounted');
+    console.log('useEffect working - component mounted');
     setTestStatus(prev => ({ ...prev, react: true, effects: true }));
     
     // Simulate data loading
@@ -90,9 +89,9 @@ export default function SimplifiedProWidget() {
       setImages(sampleImages);
       setLoading(false);
       setTestStatus(prev => ({ ...prev, hooks: true }));
-      console.log('✅ useState working - data loaded');
+      console.log('useState working - data loaded');
     }, 1000);
-  }, []);
+  }, [sampleImages]);
 
   // Test API simulation
   useEffect(() => {
@@ -100,10 +99,10 @@ export default function SimplifiedProWidget() {
       try {
         const response = await fetch('https://jsonplaceholder.typicode.com/posts/1');
         const data = await response.json();
-        console.log('✅ API fetch working:', data.title);
+        console.log('API fetch working:', data.title);
         setTestStatus(prev => ({ ...prev, api: true }));
       } catch (error) {
-        console.log('❌ API fetch failed:', error.message);
+        console.log('API fetch failed:', error.message);
       }
     };
     testAPI();
@@ -130,22 +129,22 @@ export default function SimplifiedProWidget() {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    console.log('🔄 Refresh triggered');
+    console.log('Refresh triggered');
     setTimeout(() => {
       setIsRefreshing(false);
-      console.log('✅ Refresh completed');
+      console.log('Refresh completed');
     }, 2000);
   };
 
   const handleBioToggle = () => {
     setShowBio(prev => !prev);
-    console.log('📄 Bio toggled:', !showBio);
+    console.log('Bio toggled:', !showBio);
   };
 
   const handleImageClick = (item, index) => {
     if (item) {
       alert(`Clicked: ${item.title} (${item.platform})`);
-      console.log('🖼️ Image click working:', item);
+      console.log('Image click working:', item);
     }
   };
 
@@ -177,16 +176,16 @@ export default function SimplifiedProWidget() {
         flexWrap: 'wrap'
       }}>
         <span style={{ color: testStatus.react ? 'green' : 'red' }}>
-          {testStatus.react ? '✅' : '❌'} React: {testStatus.react ? 'Working' : 'Failed'}
+          {testStatus.react ? 'OK' : 'FAIL'} React: {testStatus.react ? 'Working' : 'Failed'}
         </span>
         <span style={{ color: testStatus.hooks ? 'green' : 'red' }}>
-          {testStatus.hooks ? '✅' : '❌'} Hooks: {testStatus.hooks ? 'Working' : 'Failed'}
+          {testStatus.hooks ? 'OK' : 'FAIL'} Hooks: {testStatus.hooks ? 'Working' : 'Failed'}
         </span>
         <span style={{ color: testStatus.effects ? 'green' : 'red' }}>
-          {testStatus.effects ? '✅' : '❌'} Effects: {testStatus.effects ? 'Working' : 'Failed'}
+          {testStatus.effects ? 'OK' : 'FAIL'} Effects: {testStatus.effects ? 'Working' : 'Failed'}
         </span>
         <span style={{ color: testStatus.api ? 'green' : 'red' }}>
-          {testStatus.api ? '✅' : '❌'} API: {testStatus.api ? 'Working' : 'Failed'}
+          {testStatus.api ? 'OK' : 'FAIL'} API: {testStatus.api ? 'Working' : 'Failed'}
         </span>
       </div>
 
@@ -223,7 +222,7 @@ export default function SimplifiedProWidget() {
               fontSize: '12px'
             }}
           >
-            {isRefreshing ? '🔄 Refreshing...' : '🔄 Refresh'}
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </button>
 
           <button
@@ -284,14 +283,6 @@ export default function SimplifiedProWidget() {
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover'
-                  }}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentNode.innerHTML = `
-                      <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 10px; color: #999;">
-                        ${item.platform}<br/>${item.title}
-                      </div>
-                    `;
                   }}
                 />
               ) : (
